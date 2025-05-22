@@ -3,13 +3,13 @@ package eu.pb4.sgui.api.gui;
 import eu.pb4.sgui.api.GuiHelpers;
 import eu.pb4.sgui.api.elements.GuiElement;
 import eu.pb4.sgui.api.elements.GuiElementInterface;
-import eu.pb4.sgui.mixin.AbstractContainerMenuAccessor;
 import eu.pb4.sgui.virtual.SguiScreenHandlerFactory;
 import eu.pb4.sgui.virtual.inventory.VirtualScreenHandler;
 import eu.pb4.sgui.virtual.inventory.VirtualSlot;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.protocol.Packet;
-import net.minecraft.network.protocol.game.*;
+import net.minecraft.network.protocol.game.ClientboundContainerSetDataPacket;
+import net.minecraft.network.protocol.game.ClientboundOpenScreenPacket;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -17,9 +17,7 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.crafting.display.RecipeDisplayId;
 
-import java.util.ArrayList;
 import java.util.OptionalInt;
 
 /**
@@ -117,19 +115,8 @@ public class SimpleGui extends BaseSlotGui {
         this.title = title;
 
         if (this.isOpen()) {
-            var list = new ArrayList<Packet<? super ClientGamePacketListener>>();
-            list.add(new ClientboundOpenScreenPacket(this.syncId, this.type, title));
-            list.add(new ClientboundContainerSetContentPacket(this.syncId, this.screenHandler.getStateId(),
-                    this.screenHandler.getItems(), this.screenHandler.getCarried()));
-            for (int i = 0; i < this.properties.size(); i++) {
-                list.add(new ClientboundContainerSetDataPacket(this.syncId, i, this.properties.getInt(i)));
-            }
-
-            this.player.connection.send(new ClientboundBundlePacket(list));
-            for (var i = 0; i < this.screenHandler.slots.size(); i++) {
-                this.screenHandler.setRemoteSlot(i, this.screenHandler.slots.get(i).getItem().copy());
-            }
-            ((AbstractContainerMenuAccessor) this.screenHandler).getRemoteCarried().force(this.screenHandler.getCarried());
+            this.player.connection.send(new ClientboundOpenScreenPacket(this.syncId, this.type, title));
+            this.screenHandler.sendAllDataToRemote();
         }
     }
 
@@ -200,7 +187,7 @@ public class SimpleGui extends BaseSlotGui {
      * @param recipe the selected recipe identifier
      * @param shift  is shift was held
      */
-    public void onCraftRequest(RecipeDisplayId recipe, boolean shift) {
+    public void onCraftRequest(ResourceLocation recipe, boolean shift) {
     }
 
     @Override

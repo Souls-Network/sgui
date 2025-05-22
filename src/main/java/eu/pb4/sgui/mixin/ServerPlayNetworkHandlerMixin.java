@@ -37,7 +37,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import java.util.List;
 
 @Mixin(ServerGamePacketListenerImpl.class)
-public abstract class ServerGamePacketListenerImplMixin extends ServerCommonPacketListenerImpl {
+public abstract class ServerPlayNetworkHandlerMixin extends ServerCommonPacketListenerImpl {
 
     @Shadow
     public ServerPlayer player;
@@ -46,7 +46,7 @@ public abstract class ServerGamePacketListenerImplMixin extends ServerCommonPack
     @Unique
     private AbstractContainerMenu sgui$previousScreen = null;
 
-    public ServerGamePacketListenerImplMixin(MinecraftServer server, Connection connection, CommonListenerCookie clientData) {
+    public ServerPlayNetworkHandlerMixin(MinecraftServer server, Connection connection, CommonListenerCookie clientData) {
         super(server, connection, clientData);
     }
 
@@ -59,25 +59,25 @@ public abstract class ServerGamePacketListenerImplMixin extends ServerCommonPack
                     return;
                 }
 
-                int slot = packet.slotNum();
-                int button = packet.buttonNum();
+                int slot = packet.getSlotNum();
+                int button = packet.getButtonNum();
 
-                ClickType type = ClickType.toClickType(packet.clickType(), button, slot);
-                boolean ignore = gui.onAnyClick(slot, type, packet.clickType());
+                ClickType type = ClickType.toClickType(packet.getClickType(), button, slot);
+                boolean ignore = gui.onAnyClick(slot, type, packet.getClickType());
                 if (ignore && !handler.getGui().getLockPlayerInventory() && (slot >= handler.getGui().getSize() || slot < 0 || handler.getGui().getSlotRedirect(slot) != null)) {
                     return;
                 }
 
                 this.player.containerMenu.suppressRemoteUpdates();
-                boolean bl = packet.stateId() != this.player.containerMenu.getStateId();
+                boolean bl = packet.getStateId() != this.player.containerMenu.getStateId();
 
-                for (var entry : Int2ObjectMaps.fastIterable(packet.changedSlots())) {
-                    this.player.containerMenu.setRemoteSlotUnsafe(entry.getIntKey(), entry.getValue());
+                for (var entry : Int2ObjectMaps.fastIterable(packet.getChangedSlots())) {
+                    this.player.containerMenu.setRemoteSlotNoCopy(entry.getIntKey(), entry.getValue());
                 }
 
-                this.player.containerMenu.setRemoteCarried(packet.carriedItem());
+                this.player.containerMenu.setRemoteCarried(packet.getCarriedItem());
 
-                boolean allow = gui.click(slot, type, packet.clickType());
+                boolean allow = gui.click(slot, type, packet.getClickType());
 
                 this.player.containerMenu.resumeRemoteUpdates();
                 if (allow) {
@@ -106,9 +106,9 @@ public abstract class ServerGamePacketListenerImplMixin extends ServerCommonPack
     private void sgui$resyncGui(ServerboundContainerClickPacket packet, CallbackInfo ci) {
         if (this.player.containerMenu instanceof VirtualScreenHandler handler) {
             try {
-                int slot = packet.slotNum();
-                int button = packet.buttonNum();
-                ClickType type = ClickType.toClickType(packet.clickType(), button, slot);
+                int slot = packet.getSlotNum();
+                int button = packet.getButtonNum();
+                ClickType type = ClickType.toClickType(packet.getClickType(), button, slot);
 
                 if (type == ClickType.MOUSE_DOUBLE_CLICK || (type.isDragging && type.value == 2) || type.shift) {
                     GuiHelpers.sendPlayerScreenHandler(this.player);
@@ -183,7 +183,7 @@ public abstract class ServerGamePacketListenerImplMixin extends ServerCommonPack
     private void sgui$catchRecipeRequests(ServerboundPlaceRecipePacket packet, CallbackInfo ci) {
         if (this.player.containerMenu instanceof VirtualScreenHandler handler && handler.getGui() instanceof SimpleGui gui) {
             try {
-                gui.onCraftRequest(packet.recipe(), packet.useMaxItems());
+                gui.onCraftRequest(packet.getRecipe(), packet.isShiftDown());
             } catch (Throwable e) {
                 handler.getGui().handleException(e);
             }
@@ -300,7 +300,7 @@ public abstract class ServerGamePacketListenerImplMixin extends ServerCommonPack
         if (this.player.containerMenu instanceof HotbarScreenHandler handler) {
             var gui = handler.getGui();
             var buf = new FriendlyByteBuf(Unpooled.buffer());
-            ((ServerboundInteractPacketAccessor) packet).invokeWrite(buf);
+            ((PlayerInteractEntityC2SPacketAccessor) packet).invokeWrite(buf);
 
             int entityId = buf.readVarInt();
             var type = buf.readEnum(HotbarGui.EntityInteraction.class);

@@ -2,13 +2,14 @@ package eu.pb4.sgui.api.gui;
 
 import eu.pb4.sgui.api.ClickType;
 import eu.pb4.sgui.api.elements.GuiElementInterface;
-import eu.pb4.sgui.mixin.ServerPlayerAccessor;
+import eu.pb4.sgui.mixin.ServerPlayerEntityAccessor;
 import eu.pb4.sgui.virtual.hotbar.HotbarScreenHandler;
 import eu.pb4.sgui.virtual.inventory.VirtualSlot;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.ints.IntList;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.protocol.game.ClientboundSetCarriedItemPacket;
 import net.minecraft.network.protocol.game.ServerboundPlayerActionPacket;
 import net.minecraft.network.protocol.game.ServerboundSetCarriedItemPacket;
 import net.minecraft.server.level.ServerPlayer;
@@ -141,7 +142,7 @@ public class HotbarGui extends BaseSlotGui {
         }
 
         this.player.containerMenu = this.screenHandler;
-        ((ServerPlayerAccessor) this.player).callInitMenu(this.screenHandler);
+        ((ServerPlayerEntityAccessor) this.player).callInitMenu(this.screenHandler);
 
         this.player.connection.send(new ServerboundSetCarriedItemPacket(this.selectedSlot));
     }
@@ -276,7 +277,7 @@ public class HotbarGui extends BaseSlotGui {
         if ((this.isOpen() || screenHandlerIsClosed) && !this.reOpen) {
             if (!screenHandlerIsClosed && this.player.containerMenu == this.screenHandler) {
                 this.player.closeContainer();
-                this.player.connection.send(new ServerboundSetCarriedItemPacket(this.player.getInventory().getSelectedSlot()));
+                this.player.connection.send(new ClientboundSetCarriedItemPacket(this.player.getInventory().selected));
             }
 
             this.player.containerMenu.broadcastChanges();

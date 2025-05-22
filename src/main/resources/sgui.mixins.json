@@ -4,12 +4,11 @@
   "package": "eu.pb4.sgui.mixin",
   "compatibilityLevel": "JAVA_21",
   "mixins": [
-    "AbstractContainerMenuAccessor",
-    "AbstractContainerMenuMixin",
-    "ServerboundInteractPacketAccessor",
-    "ServerGamePacketListenerImplMixin",
-    "ServerPlayerAccessor",
-    "ServerPlayerMixin",
+    "PlayerInteractEntityC2SPacketAccessor",
+    "ScreenHandlerMixin",
+    "ServerPlayerEntityAccessor",
+    "ServerPlayerEntityMixin",
+    "ServerPlayNetworkHandlerMixin",
     "SignBlockEntityAccessor"
   ],
   "client": [

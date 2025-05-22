@@ -15,6 +15,7 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.chat.*;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Inventory;
@@ -23,7 +24,6 @@ import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.minecraft.world.item.crafting.display.RecipeDisplayId;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.item.trading.ItemCost;
 import net.minecraft.world.item.trading.MerchantOffer;
@@ -197,10 +197,10 @@ public class SGuiTest implements ModInitializer {
                     .addPage(Component.literal("Test line one!"), Component.literal("Test line two!"))
                     .addPage(
                             Component.literal("Click to navigate to page: "),
-                            Component.literal("1").withStyle(style -> style.withClickEvent(new ClickEvent.ChangePage(1))),
-                            Component.literal("2").withStyle(style -> style.withClickEvent(new ClickEvent.ChangePage(2))),
-                            Component.literal("3").withStyle(style -> style.withClickEvent(new ClickEvent.ChangePage(3))),
-                            Component.literal("Command").withStyle(style -> style.withClickEvent(new ClickEvent.RunCommand("Hello World!")))
+                            Component.literal("1").withStyle(style -> style.withClickEvent(new ClickEvent(ClickEvent.Action.CHANGE_PAGE, "1"))),
+                            Component.literal("2").withStyle(style -> style.withClickEvent(new ClickEvent(ClickEvent.Action.CHANGE_PAGE, "2"))),
+                            Component.literal("3").withStyle(style -> style.withClickEvent(new ClickEvent(ClickEvent.Action.CHANGE_PAGE, "3"))),
+                            Component.literal("Command").withStyle(style -> style.withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "Hello World!")))
                     )
                     .addPage(Component.literal("This is page three!"))
                     .setTitle("The Test Book")
@@ -288,7 +288,7 @@ public class SGuiTest implements ModInitializer {
             ServerPlayer player = objectCommandContext.getSource().getPlayer();
             SimpleGui gui = new SimpleGui(MenuType.CRAFTING, player, false) {
                 @Override
-                public void onCraftRequest(RecipeDisplayId recipeId, boolean shift) {
+                public void onCraftRequest(ResourceLocation recipeId, boolean shift) {
                     super.onCraftRequest(recipeId, shift);
                     this.player.displayClientMessage(Component.literal(recipeId.toString() + " - " + shift), false);
                 }

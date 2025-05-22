@@ -56,7 +56,7 @@ public class SignGui implements GuiInterface {
      */
     public SignGui(ServerPlayer player)  {
         this.player = player;
-        this.signEntity = new VirtualSignBlockEntity(player.level(), new BlockPos(player.blockPosition().getX(), Math.min(player.level().getMaxY(), player.blockPosition().getY() + 5), player.blockPosition().getZ()), Blocks.OAK_SIGN.defaultBlockState());
+        this.signEntity = new VirtualSignBlockEntity(player.level(), new BlockPos(player.blockPosition().getX(), Math.min(player.level().getMaxBuildHeight(), player.blockPosition().getY() + 5), player.blockPosition().getZ()), Blocks.OAK_SIGN.defaultBlockState());
     }
 
     /**

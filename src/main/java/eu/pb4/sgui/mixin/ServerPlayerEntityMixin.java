@@ -21,14 +21,14 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import java.util.OptionalInt;
 
 @Mixin(ServerPlayer.class)
-public abstract class ServerPlayerMixin extends Player implements PlayerExtensions {
+public abstract class ServerPlayerEntityMixin extends Player implements PlayerExtensions {
     @Shadow
     public abstract void doCloseContainer();
 
     @Unique
     private boolean sgui$ignoreNext = false;
 
-    public ServerPlayerMixin(ServerLevel world, BlockPos pos, float yaw, GameProfile gameProfile) {
+    public ServerPlayerEntityMixin(ServerLevel world, BlockPos pos, float yaw, GameProfile gameProfile) {
         super(world, pos, yaw, gameProfile);
     }
 

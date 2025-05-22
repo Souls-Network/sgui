@@ -5,7 +5,6 @@ import com.mojang.authlib.minecraft.MinecraftProfileTextures;
 import com.mojang.authlib.properties.Property;
 import com.mojang.authlib.properties.PropertyMap;
 import eu.pb4.sgui.api.GuiHelpers;
-import it.unimi.dsi.fastutil.objects.ReferenceSortedSets;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.component.DataComponentType;
@@ -13,14 +12,15 @@ import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.util.Unit;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.Rarity;
-import net.minecraft.world.item.component.*;
+import net.minecraft.world.item.component.CustomModelData;
+import net.minecraft.world.item.component.ItemLore;
+import net.minecraft.world.item.component.ResolvableProfile;
+import net.minecraft.world.item.component.Unbreakable;
 import net.minecraft.world.item.enchantment.Enchantment;
 import org.jetbrains.annotations.Nullable;
 
@@ -57,15 +57,6 @@ public class GuiElementBuilder implements GuiElementBuilderInterface<GuiElementB
      */
     public GuiElementBuilder(Item item) {
         this.itemStack = new ItemStack(item);
-    }
-
-    /**
-     * Constructs a GuiElementBuilder with the specified item model.
-     *
-     * @param model Item model to use. Same as calling model(...).
-     */
-    public GuiElementBuilder(ResourceLocation model) {
-        this.model(model);
     }
 
     /**
@@ -248,7 +239,7 @@ public class GuiElementBuilder implements GuiElementBuilderInterface<GuiElementB
      */
     public GuiElementBuilder noDefaults() {
         for (var x : this.itemStack.getItem().components()) {
-            if (x.type() == DataComponents.ITEM_MODEL) {
+            if (x.type() == DataComponents.CUSTOM_MODEL_DATA) {
                 continue;
             }
             if (this.itemStack.get(x.type()) == x.value()) {
@@ -346,26 +337,11 @@ public class GuiElementBuilder implements GuiElementBuilderInterface<GuiElementB
     /**
      * Sets the custom model data of the element.
      *
+     * @param value the value used for custom model data
      * @return this element builder
      */
-    public GuiElementBuilder setCustomModelData(List<Float> floats, List<Boolean> flags, List<String> strings, List<Integer> colors) {
-        this.itemStack.set(DataComponents.CUSTOM_MODEL_DATA, new CustomModelData(floats, flags, strings, colors));
-        return this;
-    }
-
-    /**
-     * Sets the model of the element.
-     *
-     * @param model model to display item as
-     * @return this element builder
-     */
-    public GuiElementBuilder model(ResourceLocation model) {
-        this.itemStack.set(DataComponents.ITEM_MODEL, model);
-        return this;
-    }
-
-    public GuiElementBuilder model(Item model) {
-        this.itemStack.set(DataComponents.ITEM_MODEL, model.components().get(DataComponents.ITEM_MODEL));
+    public GuiElementBuilder setCustomModelData(int value) {
+        this.itemStack.set(DataComponents.CUSTOM_MODEL_DATA, new CustomModelData(value));
         return this;
     }
 
@@ -375,7 +351,7 @@ public class GuiElementBuilder implements GuiElementBuilderInterface<GuiElementB
      * @return this element builder
      */
     public GuiElementBuilder unbreakable() {
-        this.itemStack.set(DataComponents.UNBREAKABLE, Unit.INSTANCE);
+        this.itemStack.set(DataComponents.UNBREAKABLE, new Unbreakable(true));
         return this;
     }
 
@@ -455,20 +431,7 @@ public class GuiElementBuilder implements GuiElementBuilderInterface<GuiElementB
      * @see GuiElementBuilder#build()
      */
     public ItemStack asStack() {
-        var copy = itemStack.copy();
-        if (this.noTooltips) {
-            copy.set(DataComponents.TOOLTIP_DISPLAY, new TooltipDisplay(true, ReferenceSortedSets.emptySet()));
-        } else {
-            var comp = TooltipDisplay.DEFAULT;
-            for (var entry : this.itemStack.getComponents()) {
-                if (entry.value() instanceof TooltipProvider && entry.type() != DataComponents.LORE) {
-                    comp = comp.withHidden(entry.type(), true);
-                }
-            }
-            copy.set(DataComponents.TOOLTIP_DISPLAY, comp);
-        }
-
-        return copy;
+        return itemStack.copy();
     }
 
     @Override
