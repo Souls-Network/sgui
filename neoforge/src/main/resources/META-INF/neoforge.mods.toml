@@ -4,7 +4,7 @@ issueTrackerURL="https://github.com/Patbox/sgui/issues"
 license="LGPLv3"
 
 [[mods]]
-modId="sgui"
+modId="sguinf"
 version="${version}"
 displayName="Server GUI"
 displayURL="https://github.com/Patbox/sgui/releases"
@@ -14,16 +14,16 @@ description='''Library for creating server side guis!'''
 displayTest="IGNORE_ALL_VERSION"
 
 [[mixins]]
-    config="sgui.mixins.json"
+    config="sguinf.mixins.json"
 
-[[dependencies.sgui]]
+[[dependencies.sguinf]]
     modId="neoforge"
     type="required"
     versionRange="[21.1.1,)"
     ordering="NONE"
     side="BOTH"
 
-[[dependencies.sgui]]
+[[dependencies.sguinf]]
     modId="minecraft"
     type="required"
     versionRange="[1.21.1,)"

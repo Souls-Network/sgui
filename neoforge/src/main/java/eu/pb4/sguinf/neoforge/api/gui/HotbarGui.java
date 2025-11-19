@@ -1,10 +1,11 @@
-package eu.pb4.sguinf.api.gui;
+package eu.pb4.sguinf.neoforge.api.gui;
 
-import eu.pb4.sgui.api.ClickType;
-import eu.pb4.sgui.api.elements.GuiElementInterface;
-import eu.pb4.sgui.mixin.ServerPlayerEntityAccessor;
-import eu.pb4.sgui.virtual.hotbar.HotbarScreenHandler;
-import eu.pb4.sgui.virtual.inventory.VirtualSlot;
+import eu.pb4.sguinf.api.ClickType;
+import eu.pb4.sguinf.api.elements.GuiElementInterface;
+import eu.pb4.sguinf.api.gui.BaseSlotGui;
+import eu.pb4.sguinf.neoforge.mixin.ServerPlayerEntityAccessor;
+import eu.pb4.sguinf.neoforge.virtual.hotbar.HotbarScreenHandler;
+import eu.pb4.sguinf.virtual.inventory.VirtualSlot;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.ints.IntList;
 import net.minecraft.core.Direction;

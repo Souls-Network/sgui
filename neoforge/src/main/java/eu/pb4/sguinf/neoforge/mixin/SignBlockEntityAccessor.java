@@ -1,4 +1,4 @@
-package eu.pb4.sguinf.mixin;
+package eu.pb4.sguinf.neoforge.mixin;
 
 import net.minecraft.world.level.block.entity.SignBlockEntity;
 import net.minecraft.world.level.block.entity.SignText;
